@@ -15,13 +15,9 @@ battery_curve = {
 def get_condition_factor(traffic):
 
     factors = {
-
         "low": 1.0,
-
         "medium": 1.2,
-
         "high": 1.4
-
     }
 
     return factors.get(
@@ -35,14 +31,14 @@ def get_soc_from_curve(distance):
 
     closest_distance = min(
         battery_curve.keys(),
-        key=lambda x: abs(x-distance)
+        key=lambda x: abs(x - distance)
     )
 
     return battery_curve[closest_distance]
 
 
 
-def predict_soc(
+def calculate_prediction(
         current_soc,
         distance,
         traffic
@@ -51,46 +47,42 @@ def predict_soc(
     factor = get_condition_factor(traffic)
 
 
-    # converts real distance into
-    # effective battery distance
-
+    # adjusted distance based on conditions
     effective_distance = (
         distance * factor
     )
 
 
-    predicted_soc = get_soc_from_curve(
+    expected_soc = get_soc_from_curve(
         effective_distance
     )
 
 
-    # adjust according to starting SOC
-
-    soc_difference = (
-        100 - predicted_soc
+    # energy consumed from 100% reference
+    energy_used = (
+        100 - expected_soc
     )
 
 
-    final_soc = (
-        current_soc - soc_difference
+    predicted_soc = (
+        current_soc - energy_used
     )
 
 
-    if final_soc < 20:
+    if predicted_soc < 20:
 
         return {
-            "predicted_soc": round(final_soc,2),
+            "predicted_soc": round(predicted_soc,2),
             "charging_required": True,
             "message":
-            "Battery level unsafe. Charging recommended."
+            "Battery unsafe. Find charging station."
         }
 
 
-    else:
-
-        return {
-            "predicted_soc": round(final_soc,2),
-            "charging_required": False,
-            "message":
-            "Destination reachable safely."
-        }
+    return {
+        "predicted_soc": round(predicted_soc,2),
+        "charging_required": False,
+        "message":
+        "Trip conditions acceptable."
+    }
+        
