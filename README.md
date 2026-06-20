@@ -46,3 +46,64 @@ The system estimates expected arrival SOC and recommends charging when the batte
 ---
 
 ## Project Architecture
+
+The project follows a modular backend architecture where each component has a separate responsibility.
+
+### 1. API Layer (FastAPI)
+
+Handles communication between the user/vehicle system and backend.
+
+Responsibilities:
+- Receives trip information
+- Validates input data using Pydantic models
+- Returns prediction results
+
+Files:
+- `main.py`
+- `models.py`
+
+---
+
+### 2. Battery Prediction Layer
+
+Contains the EV energy estimation logic.
+
+Responsibilities:
+- Loads battery discharge profile
+- Applies driving condition factors
+- Estimates expected arrival SOC
+- Determines charging requirement
+
+File:
+- `battery.py`
+
+---
+
+### 3. Battery Model Data
+
+Stores the SOC discharge curve generated from battery modeling.
+
+Format:
+
+File:
+- `vehicle_battery_profile.json`
+
+---
+
+### 4. Dynamic Update Layer
+
+Simulates vehicle telemetry updates during a trip.
+
+Responsibilities:
+- Sends updated SOC
+- Sends remaining distance
+- Sends changing traffic conditions
+- Triggers recalculation
+
+File:
+- `simulate_trip.py`
+
+---
+
+
+
